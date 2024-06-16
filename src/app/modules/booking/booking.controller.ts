@@ -10,6 +10,7 @@ const createBooking = catchAsync(async (req, res, next) => {
 
     const userId = req.user._id;
     const payload = createBookingValidationSchema.parse(req.body);
+
     const booking = await BookingServices.createBookingIntoDB(userId, payload);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
@@ -27,7 +28,7 @@ const checkAvailability = catchAsync(async (req, res, next) => {
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: "Booking created successfully",
+        message: "Availability checked successfully",
         data: result,
     })
 })
@@ -77,7 +78,7 @@ const cancelBooking = catchAsync(async (req, res, next) => {
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: "Booking created successfully",
+        message: "Cancel Booking successfully",
         data: booking,
     })
 })

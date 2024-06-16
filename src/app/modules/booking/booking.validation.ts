@@ -6,9 +6,3 @@ export const createBookingValidationSchema = z.object({
     startTime: z.string(),
     endTime: z.string(),
 })
-
-// export const checkAvailabilitySchema = z.object({
-//    body: z.object({
-//     date: z.string().optional().refine((val) => !isNaN(Date.parse(val)), { message: 'Invalid date format' }),
-//    })
-//   });
