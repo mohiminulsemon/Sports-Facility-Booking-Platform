@@ -21,7 +21,7 @@ const getAllFacilities = catchAsync(async (req, res, next) => {
         sendResponse(res, {
           statusCode: StatusCodes.OK,
           success: true,
-          message: "Services retrieved successfully",
+          message: "Facility retrieved successfully",
           data: result,
         });
       } else {
