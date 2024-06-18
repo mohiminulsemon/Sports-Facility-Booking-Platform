@@ -10,9 +10,6 @@ const userSchema = new Schema<TUser>(
     role: { type: String, enum: ["admin", "user"], required: true },
     address: { type: String, required: true },
   },
-  {
-    timestamps: true,
-  },
 );
 
 export const User = model<TUser>("User", userSchema);
