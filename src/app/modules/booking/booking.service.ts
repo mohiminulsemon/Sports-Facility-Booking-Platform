@@ -43,70 +43,19 @@ const createBookingIntoDB = async (userId: string, payload: TBooking) => {
   return result;
   };
   
-  const checkAvailability = async (date: Date) => {
-    // Set the start and end of the working day
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
+export const checkAvailability = async (payload: {
+  date?: string;
+}) => {
+  const { date } = payload;
+  const bookingDate = date || new Date().toISOString().split('T')[0];
 
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+  const availabilityBooking = await Booking.find(
+    { date: bookingDate },
+    { startTime: 1, endTime: 1, _id: 0 },
+  );
 
-    // Fetch confirmed bookings for the specified date
-    const bookings = await Booking.find({
-        date: {
-            $gte: startOfDay,
-            $lte: endOfDay,
-        },
-        isBooked: 'confirmed',
-    }).select('startTime endTime');
-
-    // Generate time slots within the working hours
-    const timeSlots = [];
-    const startTime = '08:00';
-    const endTime = '20:00';
-    const slotDurationInHours = 1;
-
-    let currentTime = new Date(`2000-01-01T${startTime}:00Z`);
-    const workingHoursEnd = new Date(`2000-01-01T${endTime}:00Z`);
-
-    while (currentTime < workingHoursEnd) {
-        const currentSlotEnd = new Date(
-            currentTime.getTime() + slotDurationInHours * 60 * 60 * 1000,
-        );
-        timeSlots.push({
-            startTime: formatTime(currentTime),
-            endTime: formatTime(currentSlotEnd),
-        });
-        currentTime = currentSlotEnd;
-    }
-
-    // Remove booked slots
-    for (const booking of bookings) {
-        const bookingStartTime = new Date(`2000-01-01T${booking.startTime}:00Z`);
-        const bookingEndTime = new Date(`2000-01-01T${booking.endTime}:00Z`);
-        
-        for (let i = 0; i < timeSlots.length; i++) {
-            const slotStartTime = new Date(`2000-01-01T${timeSlots[i].startTime}:00Z`);
-            const slotEndTime = new Date(`2000-01-01T${timeSlots[i].endTime}:00Z`);
-
-            if (
-                (bookingStartTime < slotEndTime && bookingEndTime > slotStartTime) || 
-                (bookingStartTime <= slotStartTime && bookingEndTime >= slotEndTime)
-            ) {
-                timeSlots.splice(i, 1); // Remove the overlapping slot
-                i--; // Adjust index after removal
-            }
-        }
-    }
-    return timeSlots;
+  return availabilityBooking;
 };
-
-const formatTime = (date: Date): string => {
-    const hours = date.getUTCHours().toString().padStart(2, '0');
-    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-};
-
 
 
   const getAllBookings = async () => {
@@ -116,6 +65,9 @@ const formatTime = (date: Date): string => {
   
  const getUserBookings = async (userId: string) => {
     const bookings = await Booking.find({ user: userId }).populate('facility');
+    if (!bookings) {
+      throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to Find Bookings ');
+    }
     return bookings; 
   };
   

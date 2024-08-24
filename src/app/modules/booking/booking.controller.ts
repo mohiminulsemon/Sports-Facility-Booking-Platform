@@ -40,7 +40,7 @@ const getAllBookings = catchAsync(async (req, res, next) => {
 })
 
 const getUserBookings = catchAsync(async (req, res, next) => {
-    const { user : userId } = req.params;
+    const { user : userId } = req.user._id;
     const bookings = await BookingServices.getUserBookings(userId);
 
     if (bookings.length > 0) {
@@ -77,8 +77,11 @@ const cancelBooking = catchAsync(async (req, res, next) => {
 
 const checkAvailability = catchAsync(async (req, res, next) => {
 
-  const date  = req.query.date ? new Date(req.query.date as string) : new Date();
-  const result = await BookingServices.checkAvailability(date);
+  const { date } = req.query;
+
+  const result = await BookingServices.checkAvailability({
+    date: date as string,
+  });
 
   sendResponse(res, {
       statusCode: StatusCodes.OK,
