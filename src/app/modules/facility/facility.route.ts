@@ -1,39 +1,41 @@
-import { Router } from 'express';
-import  express  from 'express';
-import { adminMiddleware, authenticate } from '../../middlewares/authenticate';
+import express from 'express';
+import { authenticate, adminMiddleware } from '../../middlewares/authenticate';
 import validateRequest from '../../middlewares/validateRequest';
 import { createFacilityValidationSchema, updateFacilityValidationSchema } from './facility.validation';
 import { FacilityController } from './facility.controller';
 
 const router = express.Router();
 
+// Admin only - Create Facility
 router.post(
-    "/",
-     authenticate,
-     adminMiddleware,
-     validateRequest(createFacilityValidationSchema),
-     FacilityController.createFacility
-)
+  "/",
+  authenticate,
+  adminMiddleware,
+  validateRequest(createFacilityValidationSchema),
+  FacilityController.createFacility
+);
 
-
+// Get All Facilities with Pagination
 router.get(
-    "/",
-    FacilityController.getAllFacilities);
-    
-    router.put(
-        "/:id",
-        authenticate,
-        adminMiddleware,
-        validateRequest(updateFacilityValidationSchema),
-        FacilityController.updateFacility,
-      );
-      
-      router.delete(
-        "/:id",
-        authenticate,
-        adminMiddleware,
-        FacilityController.deleteFacility,
-      );
+  "/",
+  FacilityController.getAllFacilities
+);
 
+// Admin only - Update Facility
+router.put(
+  "/:id",
+  authenticate,
+  adminMiddleware,
+  validateRequest(updateFacilityValidationSchema),
+  FacilityController.updateFacility
+);
+
+// Admin only - Soft Delete Facility
+router.delete(
+  "/:id",
+  authenticate,
+  adminMiddleware,
+  FacilityController.deleteFacility
+);
 
 export const FacilityRoutes = router;

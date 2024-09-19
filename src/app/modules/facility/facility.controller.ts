@@ -4,62 +4,58 @@ import sendResponse from "../../utils/sendResponse";
 import { FacilityService } from "./facility.service";
 
 const createFacility = catchAsync(async (req, res, next) => {
-    const result = await FacilityService.createFacilityIntoDB(req.body);
+  const result = await FacilityService.createFacility(req.body);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: "Facility created successfully",
-        data : result,
-    });
-})
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.CREATED,
+    message: "Facility created successfully",
+    data: result,
+  });
+});
 
 const getAllFacilities = catchAsync(async (req, res, next) => {
-    const result = await FacilityService.getAllFacility();
+  const { page = 1, limit = 10 } = req.query;
+  const result = await FacilityService.getAllFacilities(Number(page), Number(limit));
 
-    if (result.length > 0) {
-        sendResponse(res, {
-          statusCode: StatusCodes.OK,
-          success: true,
-          message: "Facility retrieved successfully",
-          data: result,
-        });
-      } else {
-        sendResponse(res, {
-          statusCode: StatusCodes.NOT_FOUND,
-          success: false,
-          message: "No Data Found",
-          data: [],
-        });
-      }
-})
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: result.facilities.length ? "Facilities retrieved successfully" : "No Data Found",
+    data: result.facilities,
+    meta: {
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+    },
+  });
+});
 
 const updateFacility = catchAsync(async (req, res, next) => {
-    const result = await FacilityService.updateFacility(req.params.id, req.body);
+  const result = await FacilityService.updateFacility(req.params.id, req.body);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: "Facility updated successfully",
-        data : result,
-    });
-})
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Facility updated successfully",
+    data: result,
+  });
+});
 
-const deleteFacility = catchAsync( async (req, res, next) => {
-    const result = await FacilityService.deleteFacility(req.params.id);
+const deleteFacility = catchAsync(async (req, res, next) => {
+  const result = await FacilityService.deleteFacility(req.params.id);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: "Facility deleted successfully",
-        data : result,
-    })
-})
-
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Facility deleted successfully",
+    data: result,
+  });
+});
 
 export const FacilityController = {
-    createFacility,
-    getAllFacilities,
-    updateFacility,
-    deleteFacility
-}
+  createFacility,
+  getAllFacilities,
+  updateFacility,
+  deleteFacility,
+};
