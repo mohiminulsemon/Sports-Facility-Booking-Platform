@@ -1,8 +1,7 @@
 import { Router } from "express";
 import { UserRoutes } from "../modules/user/user.route";
 import { FacilityRoutes } from '../modules/facility/facility.route';
-import { BookingRoutes } from "../modules/booking/booking.route";
-import { CheckAvailabilityRoutes } from "../modules/booking/availability.route";
+import { BookingRoutes, CheckAvailabilityRoutes } from "../modules/booking/booking.route";
 
 
 const router = Router();

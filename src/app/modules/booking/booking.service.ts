@@ -1,25 +1,26 @@
-import { StatusCodes } from "http-status-codes";
-import AppError from "../../errors/AppError";
-import { Facility } from "../facility/facility.model";
-import { Booking } from "./booking.model";
-import { TBooking } from "./booking.interface";
-import { Types } from "mongoose";
+import { StatusCodes } from 'http-status-codes';
+import AppError from '../../errors/AppError';
+import { Facility } from '../facility/facility.model';
+import { Booking } from './booking.model';
+import { TBooking } from './booking.interface';
+import { Types } from 'mongoose';
 
 const createBookingIntoDB = async (userId: string, payload: TBooking) => {
   const { date, startTime, endTime, facility } = payload;
 
+  // Check facility availability
   const isFacilityExists = await Facility.findById(facility);
   if (!isFacilityExists || isFacilityExists.isDeleted) {
-    throw new AppError( StatusCodes.NOT_FOUND, "Facility not found");
+    throw new AppError(StatusCodes.NOT_FOUND, 'Facility not found');
   }
-  const pricePerHour = isFacilityExists.pricePerHour;
-  const startDate = new Date(date + 'T' + startTime);
-  const endDate = new Date(date + 'T' + endTime);
-  const durationInHours =
-    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-  const payableAmount = durationInHours * pricePerHour;
 
+  // Calculate the booking price
+  const startDate = new Date(`${date}T${startTime}`);
+  const endDate = new Date(`${date}T${endTime}`);
+  const durationInHours = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+  const payableAmount = durationInHours * isFacilityExists.pricePerHour;
 
+  // Check conflicting bookings
   const conflictingBooking = await Booking.findOne({
     facility: new Types.ObjectId(facility),
     date,
@@ -28,9 +29,10 @@ const createBookingIntoDB = async (userId: string, payload: TBooking) => {
   });
 
   if (conflictingBooking) {
-    throw new Error("The facility is unavailable during the requested time slot.");
+    throw new AppError(StatusCodes.CONFLICT, 'The facility is unavailable during the requested time slot.');
   }
 
+  // Create the booking
   const result = await Booking.create({
     facility,
     date,
@@ -41,49 +43,45 @@ const createBookingIntoDB = async (userId: string, payload: TBooking) => {
   });
 
   return result;
-  };
-  
-export const checkAvailability = async (payload: {
-  date?: string;
-}) => {
-  const { date } = payload;
-  const bookingDate = date || new Date().toISOString().split('T')[0];
-
-  const availabilityBooking = await Booking.find(
-    { date: bookingDate },
-    { startTime: 1, endTime: 1, _id: 0 },
-  );
-
-  return availabilityBooking;
 };
 
+const checkAvailability = async (date: string = new Date().toISOString().split('T')[0]) => {
+  const bookings = await Booking.find(
+    { date },
+    { startTime: 1, endTime: 1, _id: 0 }
+  );
 
-  const getAllBookings = async () => {
-    const result = await Booking.find().populate('facility').populate('user');
-    return result;
-  };
-  
- const getUserBookings = async (userId: string) => {
-    const bookings = await Booking.find({ user: userId }).populate('facility');
-    if (!bookings) {
-      throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to Find Bookings ');
-    }
-    return bookings; 
-  };
-  
- const cancelBooking = async (bookingId: string) => {
-    const booking = await Booking.findByIdAndUpdate(bookingId, { isBooked: 'canceled' }, { new: true }).populate('facility');
-    if (!booking) {
-      throw new AppError(StatusCodes.NOT_FOUND, 'Booking data not found');
-    }
-    return booking;
-  };
+  return bookings;
+};
 
+const getAllBookings = async () => {
+  const result = await Booking.find().populate('facility').populate('user');
+  return result;
+};
 
-  export const BookingServices = {
-    createBookingIntoDB,
-    checkAvailability,
-    getAllBookings,
-    getUserBookings,
-    cancelBooking
+const getUserBookings = async (userId: string) => {
+  const bookings = await Booking.find({ user: userId }).populate('facility');
+  return bookings;
+};
+
+const cancelBooking = async (bookingId: string) => {
+  const booking = await Booking.findByIdAndUpdate(
+    bookingId,
+    { isBooked: 'canceled' },
+    { new: true }
+  ).populate('facility');
+
+  if (!booking) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Booking data not found');
   }
+
+  return booking;
+};
+
+export const BookingServices = {
+  createBookingIntoDB,
+  checkAvailability,
+  getAllBookings,
+  getUserBookings,
+  cancelBooking,
+};
