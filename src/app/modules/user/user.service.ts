@@ -18,6 +18,7 @@ const userSignUp = async (payload: TUser) => {
     _id: user._id,
     name: user.name,
     email: user.email,
+    imageUrl: user.imageUrl,
     phone: user.phone,
     role: user.role,
     address: user.address,
@@ -54,6 +55,7 @@ const loginUser = async (email: string, password: string) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      imageUrl: user.imageUrl,
       phone: user.phone,
       role: user.role,
       address: user.address,
@@ -63,7 +65,30 @@ const loginUser = async (email: string, password: string) => {
   };
 };
 
+// Service function to update user data
+const updateUser = async (userId: string, payload: Partial<TUser>) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { ...payload },
+    { new: true, runValidators: true }
+  ).select("-password"); // Exclude password field from the response
+
+  if (!updatedUser) {
+    throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+  }
+
+  return updatedUser;
+};
+
+// Service function to get all users from the database
+const getAllUsers = async () => {
+  const users = await User.find().select("-password"); // Exclude password field
+  return users;
+};
+
 export const UserServices = {
   userSignUp,
   loginUser,
+  getAllUsers,
+  updateUser,
 };

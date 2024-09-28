@@ -43,7 +43,34 @@ const loginUser = catchAsync(
   },
 );
 
+// Controller function to get all users
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const users = await UserServices.getAllUsers();
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "All users retrieved successfully",
+    data: users,
+  });
+});
+
+// Controller function to update user data
+const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const updatedUser = await UserServices.updateUser(id, req.body);
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User updated successfully",
+    data: updatedUser,
+  });
+});
+
 export const UserControllers = {
   userSignUp,
   loginUser,
+  getAllUsers,
+  updateUser,
 };

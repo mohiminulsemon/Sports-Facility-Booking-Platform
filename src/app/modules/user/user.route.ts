@@ -1,7 +1,7 @@
 import express from "express";
 import { UserControllers } from "./user.controller";
 import validateRequest from "../../middlewares/validateRequest";
-import { loginValidationSchema, userValidationSchema } from "./user.validation";
+import { loginValidationSchema, updateUserValidationSchema, userValidationSchema } from "./user.validation";
 import authenticate from "../../middlewares/auth.middleware";
 import { StatusCodes } from "http-status-codes";
 
@@ -37,6 +37,17 @@ router.get("/profile", authenticate, (req, res) => {
     data: req.user, 
   });
 });
+
+// Route to update user data
+router.patch(
+  "/:id",  // PATCH /api/v1/users/:id
+  authenticate,
+  validateRequest(updateUserValidationSchema),
+  UserControllers.updateUser
+);
+
+
+router.get("/allUsers", authenticate, UserControllers.getAllUsers);
 
 export const UserRoutes = router;
 

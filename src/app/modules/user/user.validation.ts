@@ -17,3 +17,15 @@ export const loginValidationSchema = z.object({
     password: z.string({ required_error: "Password is required" }),
   }),
 });
+
+// User validation schema for updating user information
+export const updateUserValidationSchema = z.object({
+  body: z.object({
+    name: z.string().min(1).max(255).optional(), // Optional for update
+    email: z.string().email().optional(), // Optional for update
+    password: z.string().min(8).optional(), // Optional for update
+    phone: z.string().regex(/^\d{11}$/).optional(), // Optional for update
+    role: z.enum(["admin", "user"]).optional(), // Optional for update
+    address: z.string().min(1).optional(), // Optional for update
+  }),
+});
