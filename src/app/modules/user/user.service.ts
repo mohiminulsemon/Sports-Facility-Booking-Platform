@@ -78,7 +78,18 @@ const updateUser = async (userId: string, payload: Partial<TUser>) => {
     throw new AppError(StatusCodes.NOT_FOUND, "User not found");
   }
 
-  return updatedUser;
+  // return updatedUser;
+  return {
+    _id: updatedUser._id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    imageUrl: updatedUser.imageUrl,
+    phone: updatedUser.phone,
+    role: updatedUser.role,
+    address: updatedUser.address,
+    createdAt: updatedUser.createdAt,
+    updatedAt: updatedUser.updatedAt,
+  };
 };
 
 // Service function to get all users from the database
