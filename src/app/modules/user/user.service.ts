@@ -38,6 +38,7 @@ const loginUser = async (email: string, password: string) => {
     _id: user._id,
     name: user.name,
     email: user.email,
+    imageUrl: user.imageUrl,
     phone: user.phone,
     role: user.role,
     address: user.address,
