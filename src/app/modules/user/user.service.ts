@@ -92,6 +92,17 @@ const updateUser = async (userId: string, payload: Partial<TUser>) => {
   };
 };
 
+// Service to get user by ID
+const getUserById = async (userId: string) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
+  }
+
+  return user;
+};
+
 // Service function to get all users from the database
 const getAllUsers = async () => {
   const users = await User.find().select("-password"); // Exclude password field
@@ -103,4 +114,5 @@ export const UserServices = {
   loginUser,
   getAllUsers,
   updateUser,
+  getUserById,
 };

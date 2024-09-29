@@ -30,13 +30,8 @@ router.post("/logout", authenticate, (req, res) => {
 });
 
 
-router.get("/profile", authenticate, (req, res) => {
-  res.status(StatusCodes.OK).json({
-    success: true,
-    statusCode: StatusCodes.OK,
-    data: req.user, 
-  });
-});
+// Route to get user profile by ID
+router.get('/profile/:id', authenticate, UserControllers.getUserById);
 
 // Route to update user data
 router.patch(

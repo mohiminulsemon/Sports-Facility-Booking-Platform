@@ -43,6 +43,19 @@ const loginUser = catchAsync(
   },
 );
 
+// Controller to get user data by ID
+const getUserById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await UserServices.getUserById(id);
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User retrieved successfully",
+    data: user,
+  });
+});
+
 // Controller function to get all users
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const users = await UserServices.getAllUsers();
@@ -73,4 +86,5 @@ export const UserControllers = {
   loginUser,
   getAllUsers,
   updateUser,
+  getUserById,  
 };
