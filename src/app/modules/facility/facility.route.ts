@@ -21,6 +21,12 @@ router.get(
   FacilityController.getAllFacilities
 );
 
+// Get Single Facility 
+router.get(
+  "/:id",
+  FacilityController.getSingleFacility
+)
+
 // Admin only - Update Facility
 router.put(
   "/:id",

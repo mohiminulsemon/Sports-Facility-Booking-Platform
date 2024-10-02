@@ -42,7 +42,7 @@ router.patch(
 );
 
 
-router.get("/allUsers", authenticate, UserControllers.getAllUsers);
+router.get("/allUsers", UserControllers.getAllUsers);
 
 export const UserRoutes = router;
 
